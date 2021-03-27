@@ -12,6 +12,7 @@ class Axis {
     AccelStepper& _stepper;
     const int8_t _deadZone = 4;
     Mode _mode = Mode::stopped;
+    float _speed;
 
   public:
     Axis(AccelStepper& stepper, int8_t deadZone) : _stepper(stepper), _deadZone(deadZone) {}
@@ -34,12 +35,40 @@ class Axis {
       }
     }
 
-    void run() {
-      if (_mode == Mode::jogging) {
+    void setSpeed(float speed) {
+      _speed = speed;
+      _stepper.setAcceleration(speed);
+      _stepper.setMaxSpeed(speed);
+    }
+
+    long position() {
+      return _stepper.currentPosition();
+    }    
+
+    void moveTo(long position, uint8_t throttle) {
+      float speed = _speed * throttle / 255;
+
+      _stepper.setMaxSpeed(speed);
+      _stepper.setAcceleration(speed);
+      _stepper.moveTo(position);
+      _stepper.run();
+    }
+
+    void run(int8_t throttle) {
+        _stepper.setMaxSpeed(_speed);
+
+      float speed;
+
+      if (throttle < -_deadZone) {
+        speed = (throttle + _deadZone) * _speed / 127;        
+        _stepper.setSpeed(speed);
         _stepper.runSpeed();
-      } 
-      else {
-        _stepper.run();
+      } else if (throttle > _deadZone) {
+        speed = (throttle - _deadZone) * _speed / 127;
+        _stepper.setSpeed(speed);
+        _stepper.runSpeed();
+      } else {
+        _stepper.stop();
       }
     }
 };
