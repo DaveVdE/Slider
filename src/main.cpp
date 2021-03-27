@@ -22,7 +22,6 @@ Speed speeds[] = {
 };
 
 void setup() {
-  // Configuring X axis, 800 steps/rev, max speed 4 rev/s, accel at 800 for now.
   stepperX.setMaxSpeed(3200);
   stepperX.setAcceleration(3200);
   stepperY.setMaxSpeed(400);
@@ -31,7 +30,7 @@ void setup() {
   stepperZ.setAcceleration(400);
 
   // Configure to receive PS4 commands
-  PS4.begin((char*) "DC:A6:32:EA:3B:2D");
+  PS4.begin((char*) "DC:A6:32:EA:3B:2D"); 
 }
 
 Axis x_axis(stepperX, 4);
